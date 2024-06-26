@@ -1,7 +1,8 @@
 # Import the libraries to connect to the database and present the information in tables
 import sqlite3
+from easygui import *
 from tabulate import tabulate
-
+title = "Valorant Match Stats"
 # This is the filename of the database to be used
 DB_NAME = 'valorant_match_stats.db'
 def cont():
@@ -301,7 +302,7 @@ def basic_custom():
                                 "C: Username\n"
                                 "D: Agent\n"
                                 "E: Combat Score\n"
-                                "F: KDA"
+                                "F: KDA\n"
                                 "G: Kills\n"
                                 "H: Deaths\n"
                                 "I: Assists\n"
@@ -322,27 +323,16 @@ def basic_custom():
         print("")
         query = naming_selection(column_list, choice)
         final_query(query, choice)
-        
 
-print("\n\n\n\nWelcome to Jonathon's Valorant Stats database.\n")
-choice = ""
-while choice != "Z":
-    choice = input( "Type the letter for the setting you want.\n"
-                    "A: Select SQL queries from pre-made views.\n"
-                    "B: A basic custom view maker. (Parameter Queries)\n"
-                    "C: An advanced SQL Query input.\n"
-                    "Z: Exit\n\n"
-                    "Enter your choice here: ")
-    choice = choice.upper()
-    if choice == "A":
+def start():
+    choices = ["Select SQL queries from pre-made views.", "A basic custom view maker. (Parameter Queries)", "An advanced SQL Query input."]
+    choice = choicebox("Welcome to Jonathon's Valorant Stats database.\n Please choose a setting.", title, choices, 0)
+    if choice == choices[0]:
         select_view()
-    elif choice == "B":
+    elif choice == choices[1]:
         basic_custom()
-    elif choice == 'C': 
+    elif choice == choices[2]: 
         print("You chose C: An advanced SQL Query input")
         inp = input("Enter your query here:\n")
         sql_input(inp)
-    elif choice == "Z":
-        print("Thank you for using Jonathon's Valorant Stats database. Goodbye.\n")
-    else:
-        print("That is not a valid decision, please try again\n")
+start()

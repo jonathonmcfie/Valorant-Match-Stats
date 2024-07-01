@@ -5,18 +5,6 @@ from tabulate import tabulate
 title = "Valorant Match Stats"
 # This is the filename of the database to be used
 DB_NAME = 'valorant_match_stats.db'
-def cont():
-    cont = ""
-    while cont != "Y" or cont != "N":
-        cont = input("Continue? (y/n) ")
-        cont = cont.upper()
-        if cont == "Y":
-            return()
-        elif cont == "N":
-            print("Thank you for using Jonathon's Valorant Stats database. Goodbye.\n")
-            exit()
-        else:
-            print("That is not a valid decision, please try again\n")
 def print_view(view_name):
     ''' Prints the specified view from the database in a table '''
     # Set up the connection to the database
@@ -32,42 +20,29 @@ def print_view(view_name):
     headings = headings = [description[0] for description in cursor.description]
 
     # Print the results in a table with the headings
-    print(tabulate(results,headings))
+    choice = view_name[1:-1]
+    if codebox(f"You selected {choice}.\nTo continue using the interface, click OK. Otherwise, press Esc or click Cancel", choice, tabulate(results,headings,tablefmt="simple_outline")):
+        select_view()
+    else:
+        msgbox("Thank you for using Jonathon's Valorant Match Stats GUI")
+
     db.close()
-    cont()
 
 def select_view():
-    print("You chose A: Select SQL queries from pre-made views.\n")
-    choice = ""
-    while choice != "Z":
-        choice = input( "\nType the letter for the info you want.\n"
-                        "A: Average Player Stats\n"
-                        "B: Average Team Stats\n"
-                        "C: Matches Won\n"
-                        "D: MVP Details\n"
-                        "E: Player's Best Matches\n"
-                        "Z: Back\n\n"
-                        "Enter your choice here: ")
-        choice = choice.upper()
-        if choice == "A":
-            print("You chose A: Average Player Stats.\n")
-            print_view("[Average Player Stats]")
-        elif choice == "B":
-            print("You chose B: Average Team Stats\n")
-            print_view("[Average Team Stats]")
-        elif choice == "C":
-            print("You chose C: Matches Won\n")
-            print_view("[Matches Won]")
-        elif choice == "D":
-            print("You chose D: MVP Details\n")
-            print_view("[MVP Details]")
-        elif choice == "E":
-            print("You chose E: Player's Best Matches\n")
-            print_view("[Player's Best Matches]")
-        elif choice == "Z":
-            print("Returning to main selection screen.\n")
-        else:
-            print("That is not a valid decision, please try again\n")
+    choices = ["Average Player Stats", "Average Team Stats", "Matches Won", "MVP Details", "Player's Best Matches"]
+    choice = choicebox("Please choose a pre-made view", "Pre-Made Views", choices)
+    if choice == choices[0]:
+        print_view("[Average Player Stats]")
+    elif choice == choices[1]:
+        print_view("[Average Team Stats]")
+    elif choice == choices[2]:
+        print_view("[Matches Won]")
+    elif choice == choices[3]:
+        print_view("[MVP Details]")
+    elif choice == choices[4]:
+        print_view("[Player's Best Matches]")
+    else:
+        start()
 def final_query(query, choice):
     if choice == "A":
         where = paramA()
@@ -248,9 +223,11 @@ def sql_input(inp):
     headings = headings = [description[0] for description in cursor.description]
 
     # Print the results in a table with the headings
-    print(tabulate(results,headings))
+    if codebox(f"Here is your custom view.\nTo continue using the interface, click OK. Otherwise, press Esc or click Cancel", "Finished View", tabulate(results,headings,tablefmt="simple_outline")):
+        basic_custom()
+    else:
+        msgbox("Thank you for using Jonathon's Valorant Match Stats GUI")
     db.close()
-    cont()
 
 def basic_custom():
     print("You chose B: A basic custom view maker. (Parameter Queries)\n")

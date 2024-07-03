@@ -1,0 +1,14 @@
+match_id,gamemode,map,team_mvp,match_length,outcome
+1,Swiftplay,Lotus,6,00:08:31,lose
+2,Swiftplay,Abyss,8,00:14:26,win
+3,Swiftplay,Split,4,00:15:50,lose
+4,Spike Rush,Abyss,4,00:07:34,lose
+5,Swiftplay,Icebox,6,00:17:00,lose
+6,Unrated,Sunset,4,00:19:34,lose
+7,Swiftplay,Sunset,8,00:14:03,win
+8,Unrated,Acsent,6,00:13:05,lose
+9,Unrated,Lotus,2,00:43:06,lose
+10,Unrated,Fractur,2,00:30:34,win
+11,Swiftplay,Haven,2,00:12:42,win
+12,Unrated,Acsent,1,00:30:39,lose
+13,Unrated,Split,1,00:28:18,win

@@ -44,11 +44,11 @@ def select_view():
     else:
         start()
 def final_query(query, choice):
-    if choice == "A":
+    if choice == "Player Details":
         where = paramA()
-    elif choice == "B":
+    elif choice == "Match Details":
         where = paramB()
-    elif choice == "C":
+    elif choice == "Match Stats":
         where = paramC()
     
     sql_input(query + where)
@@ -57,56 +57,70 @@ def paramA():
     # Params are Username & Level Range
     valid = False
     while valid != True:
-        param_choice = input("Please select a filter/parameter:\n"
-                            "A: Username\n"
-                            "B: Level Range\n"
-                            "Z: No Filter\n").upper()
-        if param_choice == "A":
+        choices = ["Username", "Level Range", "No Filter"]
+        param_choice = choicebox("Please select a filter/parameter", "Custom View (Choose Filter/Parameter)", choices)
+        if param_choice == "Username":
             valid = True
-            return(" where username = '"+ input("Please enter a username (Make sure the spelling is correct):\n")+"'")
-        elif param_choice == "B":
-            param = input("Please enter a minimum level:\n")
+            choice = enterbox("Please enter a username (Make sure the spelling is correct)","Custom View (Enter Username)")
+            if choice == None:
+                    paramA()
+            return(" where username = '"+ choice+"'")
+        elif param_choice == "Level Range":
             valid = True
             try:
-                return(f" where level > {str(int(param))} and level < "+ str(int(input("Please enter a maximum level:\n"))))
+                choice = multenterbox("Please enter a minimum & maximum level", "Custom View (Enter Levels)", ["Minimum Level", "Maximum Level"])
+                if choice == None:
+                    paramA()
+                return(f" where level > {str(int(choice[0]))} and level < "+ str(int(choice[1])))
             except:
                 valid = False
-                print("That is not a selection. Please try again.")
-        elif param_choice == "Z":
+                msgbox("That is not a selection. Please try again.", "Custom View (Invalid Selection)")
+        elif param_choice == "No Filter":
             valid = True
             return("")
-        else:
-            print("That is not a selection. Please try again.")
+        elif param_choice == None:
+            valid = True
+            basic_custom()
 def paramB():
     # Params are Match ID, Map & Outcome
     valid = False
     while valid != True:
-        param_choice = input("Please select a filter/parameter:\n"
-                            "A: Match ID\n"
-                            "B: Gamemode\n"
-                            "C: Map\n"
-                            "D: Outcome\n"
-                            "Z: No Filter\n").upper()
-        if param_choice == "A":
+        choices = ["Match ID", "Gamemode", "Map", "Outcome"]
+        param_choice = choicebox("Please select a filter/parameter", "Custom View (Choose Filter/Parameter)", choices)
+        if param_choice == "Match ID":
             valid = True
             try:
-                return(" where match_id = '"+str(int(input("Please enter a Match ID:\n")))+"'")
+                choice = integerbox("Please enter a Match ID", "Custom View (Enter Match ID)")
+                if choice == None:
+                    paramB()
+                return(" where match_id = '"+str(int(choice))+"'")
             except:
                 valid = False
-        elif param_choice == "B":
+        elif param_choice == "Gamemode":
             valid = True
-            return(" where gamemode = '"+input("Please enter a gamemode (Make sure the spelling is correct):\n").title()+"'")
-        elif param_choice == "C":
+            choice = enterbox("Please enter a gamemode (Make sure the spelling is correct)","Custom View (Enter Gamemode)")
+            if choice == None:
+                    paramB()
+            return(" where gamemode = '"+ choice+"'")
+        elif param_choice == "Map":
             valid = True
-            return(" where map = '"+input("Please enter a map (Make sure the spelling is correct):\n").title()+"'")
-        elif param_choice == "D":
-            param = input("Please enter an outcome (Win or Lose):\n").title().lower()
-            if param == "win" or param == "lose":
-                valid = True
-                return(f" where outcome = '{param}'")
-        elif param_choice == "Z":
+            choice = enterbox("Please enter a map (Make sure the spelling is correct)","Custom View (Enter Map)")
+            if choice == None:
+                    paramB()
+            return(" where map = '"+ choice+"'")
+        elif param_choice == "Outcome":
+            choices = ["Win", "Lose"]
+            choice = choicebox("Please enter an outcome:", "Custom View (Enter Outcome)", choices)
+            if choice == None:
+                    paramB()
+            return(f" where outcome = '{choice.lower()}'")
+        elif param_choice == "No Filter":
             valid = True
             return("")
+        elif param_choice == None:
+            valid = True
+            basic_custom()
+            exit()
         else:
             print("That is not a selection. Please try again.")
 def paramC():
@@ -147,61 +161,55 @@ def paramC():
             return("")
         else:
             print("That is not a selection. Please try again.")
-def naming_selection(lst, tabl):
+def naming_selection(lst, tabl, choices):
     newlist = []
-    if tabl == "A":
+    if tabl == "Player Details":
         table = "player_details"
         for i in lst:
-            if i == "A":
+            if i == choices[0]:
                 newlist.append("player_id as 'player id'")
-            elif i == "B":
+            elif i == choices[1]:
                 newlist.append("username")
-            elif i == "C":
+            elif i == choices[2]:
                 newlist.append("level")
-            elif i == "D":
-                newlist.append("rank")
             elif i == "*":
                 newlist.append("*")
-    elif tabl == "B":
+    elif tabl == "Match Details":
         table = "match_stats"
         for i in lst:
-            if i == "A":
+            if i == choices[0]:
                 newlist.append("match_id as 'match id'")
-            elif i == "B":
+            elif i == choices[1]:
                 newlist.append("map")
-            elif i == "C":
+            elif i == choices[2]:
                 newlist.append("team_mvp as 'team mvp'")
-            elif i == "D":
+            elif i == choices[3]:
                 newlist.append("match_length as 'match length'")
-            elif i == "E":
+            elif i == choices[4]:
                 newlist.append("outcome")
             elif i == "*":
                 newlist.append("*")
-    elif tabl == "C":
+    elif tabl == "Match Stats":
         table = "team_stats left join player_details on team_stats.player_id = player_details.player_id"
         for i in lst:
-            if i == "A":
+            if i == choices[0]:
                 newlist.append("match_id as 'match id'")
-            elif i == "B":
+            elif i == choices[1]:
                 newlist.append("team_stats.player_id as 'player id'")
-            elif i == "C":
+            elif i == choices[2]:
                 newlist.append("username") 
-            elif i == "D":
+            elif i == choices[3]:
                 newlist.append("agent")
-            elif i == "E":
+            elif i == choices[4]:
                 newlist.append("combat_score as 'combat score'")
-            elif i == "F":
+            elif i == choices[5]:
                 newlist.append("kills")
-            elif i == "G":
+            elif i == choices[6]:
                 newlist.append("deaths")
-            elif i == "H":
+            elif i ==choices[7]:
                 newlist.append("assists")
-            elif i == "I":
-                newlist.append("headshots")
-            elif i == "J":
-                newlist.append("eco")
-            elif i == "K":
-                newlist.append("accuracy") 
+            elif i == choices[8]:
+                newlist.append("econ")
             elif i == "*":
                 newlist.append("*")
             
@@ -230,80 +238,35 @@ def sql_input(inp):
     db.close()
 
 def basic_custom():
-    print("You chose B: A basic custom view maker. (Parameter Queries)\n")
-    choice = ""
-    while choice != "Z" or choice != "A" or choice != "B" or choice != "C":
-        choice = input("Please choose a table:\n"
-                            "A: Player Details\n"
-                            "B: Match Details\n"
-                            "C: Match Stats\n"
-                            "Z: Exit\n")
-        try:
-            choice = choice.upper()
-        except:
-            print("ERROR!!!")
-        # Player Details
-        if choice == "A":
-            print("You chose A: Player Details, Choose what columns you want to view.\n")
-            column_list = input("The columns:\n"
-                                "A: Player ID\n"
-                                "B: Username\n"
-                                "C: Level\n"
-                                "D: Rank\n"
-                                "Enter the columns you want to view (Seperated by a space e.g. 'A B C'): ").split()
-            print("")
-            for i in range(len(column_list)):
-                column_list[i] = column_list[i].upper()
-            
-        # Match Details
-        elif choice == "B":
-            print("You chose B: Match Details, Choose what columns you want to view.\n")
-            column_list = input("The columns:\n"
-                                "A: Match ID\n"
-                                "B: Gamemode\n"
-                                "C: Map\n"
-                                "D: Team MVP\n"
-                                "E: Match Length\n"
-                                "F: Outcome (Win/Lose)\n"
-                                "Enter the columns you want to view (Seperated by a space e.g. 'A B C'): ").split()
-            print("")
-            for i in range(len(column_list)):
-                column_list[i] = column_list[i].upper()
-            
-        # Match Stats
-        elif choice == "C":
-            print("You chose C: Match Stats, Choose what columns you want to view.\n")
-            column_list = input("The columns:\n"
-                                "A: Match ID\n"
-                                "B: Player ID\n"
-                                "C: Username\n"
-                                "D: Agent\n"
-                                "E: Combat Score\n"
-                                "F: KDA\n"
-                                "G: Kills\n"
-                                "H: Deaths\n"
-                                "I: Assists\n"
-                                "J: Headshots\n"
-                                "K: Eco Score\n"
-                                "L: Accuracy\n"
-                                "M: Best Round\n"
-                                "Enter the columns you want to view (Seperated by a space e.g. 'A B C'): ").split()
-            print("")
-            for i in range(len(column_list)):
-                column_list[i] = column_list[i].upper()
-            
-        elif choice == "Z":
-            print("Returning to main selection screen.\n")
-        elif choice != "A" or choice != "B" or choice != "C" or choice != "Z":
-            print("That is not a valid decision, please try again\n")       
-         # select names
-        print("")
-        query = naming_selection(column_list, choice)
-        final_query(query, choice)
+    choices = ["Player Details", "Match Details", "Match Stats"]
+    choice = choicebox("Please choose a table for your custom view", "Custom View (Choose Table)", choices)
+     # Player Details
+    if choice == "Player Details":
+        choices = ["Player ID","Username","Level"]
+        column_list = multchoicebox("You chose the Player Details table\n\nPlease choose what columns you want to view.\n", "Custom View (Choose Columns)", choices)
+        
+    # Match Details
+    elif choice == "Match Details":
+        choices = ["Match ID", "Gamemode", "Map", "Team MVP", "Match Length", "Outcome (Win/Lose)"]
+        column_list = multchoicebox("You chose the Match Details table\n\nPlease choose what columns you want to view.\n", "Custom View (Choose Columns)", choices)
+        
+    # Match Stats
+    elif choice == "Match Stats":
+        choices["Match ID", "Player ID", "Username", "Agent", "Combat Score", "KDA", "Kills", "Deaths", "Assists", "Headshots", "Eco Score", "Accuracy", "Best Round"]
+        column_list = multchoicebox("You chose the Match Stats table\n\nPlease choose what columns you want to view.\n", "Custom View (Choose Columns)", choices)
+        
+    elif choice == None:
+        start()    
+    if column_list == None:
+        basic_custom()
+    # select names
+    print("")
+    query = naming_selection(column_list, choice, choices)
+    final_query(query, choice)
 
 def start():
     choices = ["Select SQL queries from pre-made views.", "A basic custom view maker. (Parameter Queries)", "An advanced SQL Query input."]
-    choice = choicebox("Welcome to Jonathon's Valorant Stats database.\n Please choose a setting.", title, choices, 0)
+    choice = choicebox("Welcome to Jonathon's Valorant Stats database.\nPlease choose a setting.", title, choices)
     if choice == choices[0]:
         select_view()
     elif choice == choices[1]:
@@ -312,4 +275,7 @@ def start():
         print("You chose C: An advanced SQL Query input")
         inp = input("Enter your query here:\n")
         sql_input(inp)
+    elif choice == None:
+        msgbox("Thank you for using Jonathon's Valorant Match Stats GUI")
+        quit()
 start()

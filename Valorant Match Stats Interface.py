@@ -85,7 +85,7 @@ def paramB():
     # Params are Match ID, Map & Outcome
     valid = False
     while valid != True:
-        choices = ["Match ID", "Gamemode", "Map", "Outcome"]
+        choices = ["Match ID", "Gamemode", "Map", "Outcome", "No Filter"]
         param_choice = choicebox("Please select a filter/parameter", "Custom View (Choose Filter/Parameter)", choices)
         if param_choice == "Match ID":
             valid = True
@@ -127,38 +127,49 @@ def paramC():
     # Params are Match ID, Username, Combat Score Range, Kills Range & Deaths Range
     valid = False
     while valid != True:
-        param_choice = input("Please select a filter/parameter:\n"
-                            "A: Match ID\n"
-                            "B: Username\n"
-                            "C: Combat Score Range\n"
-                            "D: KDA Range\n"
-                            "Z: No Filter\n").upper()
-        if param_choice == "A":
+        choices = ["Match ID", "Username", "Combat Score Range", "KDA Range", "No Filter"]
+        param_choice = choicebox("Please select a filter/parameter", "Custom View (Choose Filter/Parameter)", choices)
+        if param_choice == "Match ID":
             valid = True
             try:
-                return(" where match_id = '"+str(int(input("Please enter a Match ID:\n")))+"'")
+                choice = integerbox("Please enter a Match ID", "Custom View (Enter Match ID)")
+                if choice == None:
+                    paramC()
+                return(" where match_id = '"+str(int(choice))+"'")
             except:
                 valid = False
-        elif param_choice == "B":
+        if param_choice == "Username":
             valid = True
-            return(" where username = '"+input("Please enter a username (Make sure the spelling is correct):\n")+"'" )
-        elif param_choice == "C":
-            param = input("Please enter a minimum Combat Score:\n")
-            valid = True
-            try:
-                return(f" where combat_score > {str(int(param))} and combat_score < "+str(int(input("Please enter a maximum Combat Score:\n"))))
-            except:
-                valid = False
-        elif param_choice == "D":
-            param = input("Please enter a minimum KDA:\n")
+            choice = enterbox("Please enter a username (Make sure the spelling is correct)","Custom View (Enter Username)")
+            if choice == None:
+                    paramC()
+            return(" where username = '"+ choice+"'")
+        elif param_choice == "Combat Score Range":
             valid = True
             try:
-                return(f" where kda > {str(float(param))} and kda < "+str(float(input("Please enter a maximum KDA:\n"))))
+                choice = multenterbox("Please enter a minimum & maximum combat score", "Custom View (Enter Combat Scores)", ["Minimum Combat Score", "Maximum Combat Score"])
+                if choice == None:
+                    paramC()
+                return(f" where combat_score > {str(int(choice[0]))} and combat_score < "+ str(int(choice[1])))
             except:
                 valid = False
-        elif param_choice == "Z":
+                msgbox("That is not a selection. Please try again.", "Custom View (Invalid Selection)")
+        elif param_choice == "KDA Range":
+            valid = True
+            try:
+                choice = multenterbox("Please enter a minimum & maximum KDA", "Custom View (Enter KDAs)", ["Minimum KDA", "Maximum KDA"])
+                if choice == None:
+                    paramC()
+                return(f" where kda > {str(int(choice[0]))} and kda < "+ str(int(choice[1])))
+            except:
+                valid = False
+                msgbox("That is not a selection. Please try again.", "Custom View (Invalid Selection)")
+        elif param_choice == "No Filter":
             valid = True
             return("")
+        elif param_choice == None:
+            valid = True
+            basic_custom()
         else:
             print("That is not a selection. Please try again.")
 def naming_selection(lst, tabl, choices):
@@ -201,14 +212,16 @@ def naming_selection(lst, tabl, choices):
             elif i == choices[3]:
                 newlist.append("agent")
             elif i == choices[4]:
-                newlist.append("combat_score as 'combat score'")
+                newlist.append("kda")
             elif i == choices[5]:
-                newlist.append("kills")
+                newlist.append("combat_score as 'combat score'")
             elif i == choices[6]:
+                newlist.append("kills")
+            elif i == choices[7]:
                 newlist.append("deaths")
-            elif i ==choices[7]:
+            elif i ==choices[8]:
                 newlist.append("assists")
-            elif i == choices[8]:
+            elif i == choices[9]:
                 newlist.append("econ")
             elif i == "*":
                 newlist.append("*")
@@ -221,7 +234,8 @@ def sql_input(inp):
     # Set up the connection to the database
     db = sqlite3.connect(DB_NAME)
     cursor = db.cursor()
-
+    if inp == None:
+        start()
     # Get the results from the view
     sql = inp
     cursor.execute(sql)
@@ -252,7 +266,7 @@ def basic_custom():
         
     # Match Stats
     elif choice == "Match Stats":
-        choices["Match ID", "Player ID", "Username", "Agent", "Combat Score", "KDA", "Kills", "Deaths", "Assists", "Headshots", "Eco Score", "Accuracy", "Best Round"]
+        choices = ["Match ID", "Player ID", "Username", "Agent", "Combat Score", "KDA", "Kills", "Deaths", "Assists", "Econ Score"]
         column_list = multchoicebox("You chose the Match Stats table\n\nPlease choose what columns you want to view.\n", "Custom View (Choose Columns)", choices)
         
     elif choice == None:
@@ -272,8 +286,10 @@ def start():
     elif choice == choices[1]:
         basic_custom()
     elif choice == choices[2]: 
-        print("You chose C: An advanced SQL Query input")
-        inp = input("Enter your query here:\n")
+        headings = ["player_details", "team_stats", "match_stats"]
+        columns = [['player_id', 'match_id', 'match_id'], ['username', 'player_id', 'gamemode'], ['level', 'agent', 'map'], ['', 'combat_score', 'team_mvp'], ['', 'kda', 'match_length'], ['', 'kills', 'outcome'], ['', 'deaths', ''], ['', 'assists', ''], ['', 'econ', '']]
+        table = tabulate(columns,headings,tablefmt="simple_outline")
+        inp = codebox(f"Avalible Tables & Columns:\n{table}\nEnter your SQL query here:", "Custom SQL Query", "SELECT \n\nFROM ")
         sql_input(inp)
     elif choice == None:
         msgbox("Thank you for using Jonathon's Valorant Match Stats GUI")
